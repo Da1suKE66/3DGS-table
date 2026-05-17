@@ -1,0 +1,12 @@
+.DS_Store
+
+# Scene data can be large and should be regenerated locally.
+scenes/*/raw/
+scenes/*/images/
+scenes/*/database.db
+scenes/*/sparse/
+scenes/*/dense/
+scenes/*/stereo/
+
+!scenes/.gitkeep
+
