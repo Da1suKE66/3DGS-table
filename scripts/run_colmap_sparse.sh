@@ -41,6 +41,10 @@ images_dir="$scene_dir/images"
 database_path="$scene_dir/database.db"
 sparse_dir="$scene_dir/sparse"
 matcher="${MATCHER:-sequential}"
+max_image_size="${COLMAP_MAX_IMAGE_SIZE:-2000}"
+feature_threads="${COLMAP_FEATURE_THREADS:-2}"
+match_threads="${COLMAP_MATCH_THREADS:-4}"
+max_num_features="${COLMAP_MAX_NUM_FEATURES:-6000}"
 
 if [[ ! -d "$images_dir" ]]; then
   printf "Images directory does not exist: %s\n" "$images_dir" >&2
@@ -73,6 +77,10 @@ mkdir -p "$sparse_dir"
 
 printf "Running COLMAP sparse reconstruction for scene '%s' with %s image(s).\n" "$scene_name" "$image_count"
 printf "Matcher: %s\n\n" "$matcher"
+printf "Max image size: %s\n" "$max_image_size"
+printf "Feature threads: %s\n" "$feature_threads"
+printf "Matching threads: %s\n" "$match_threads"
+printf "Max SIFT features/image: %s\n\n" "$max_num_features"
 
 colmap feature_extractor \
   --database_path "$database_path" \
@@ -80,18 +88,22 @@ colmap feature_extractor \
   --ImageReader.single_camera 1 \
   --ImageReader.camera_model OPENCV \
   --FeatureExtraction.use_gpu 0 \
-  --FeatureExtraction.max_image_size 3200
+  --FeatureExtraction.num_threads "$feature_threads" \
+  --FeatureExtraction.max_image_size "$max_image_size" \
+  --SiftExtraction.max_num_features "$max_num_features"
 
 case "$matcher" in
   sequential)
     colmap sequential_matcher \
       --database_path "$database_path" \
-      --FeatureMatching.use_gpu 0
+      --FeatureMatching.use_gpu 0 \
+      --FeatureMatching.num_threads "$match_threads"
     ;;
   exhaustive)
     colmap exhaustive_matcher \
       --database_path "$database_path" \
-      --FeatureMatching.use_gpu 0
+      --FeatureMatching.use_gpu 0 \
+      --FeatureMatching.num_threads "$match_threads"
     ;;
   *)
     printf "Unsupported MATCHER: %s\n" "$matcher" >&2
