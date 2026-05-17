@@ -79,18 +79,19 @@ colmap feature_extractor \
   --image_path "$images_dir" \
   --ImageReader.single_camera 1 \
   --ImageReader.camera_model OPENCV \
-  --SiftExtraction.use_gpu 0
+  --FeatureExtraction.use_gpu 0 \
+  --FeatureExtraction.max_image_size 3200
 
 case "$matcher" in
   sequential)
     colmap sequential_matcher \
       --database_path "$database_path" \
-      --SiftMatching.use_gpu 0
+      --FeatureMatching.use_gpu 0
     ;;
   exhaustive)
     colmap exhaustive_matcher \
       --database_path "$database_path" \
-      --SiftMatching.use_gpu 0
+      --FeatureMatching.use_gpu 0
     ;;
   *)
     printf "Unsupported MATCHER: %s\n" "$matcher" >&2
@@ -117,4 +118,3 @@ Next:
   ./scripts/export_sparse_ply.sh $scene_name
 
 MSG
-

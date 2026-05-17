@@ -42,6 +42,25 @@ fi
 
 count=0
 
+convert_heic_to_jpeg() {
+  local src="$1"
+  local dst="$2"
+
+  if command -v heif-convert >/dev/null 2>&1; then
+    heif-convert "$src" "$dst" >/dev/null
+  elif command -v sips >/dev/null 2>&1; then
+    sips -s format jpeg "$src" --out "$dst" >/dev/null
+  else
+    printf "Cannot convert HEIC/HEIF without heif-convert or sips: %s\n" "$src" >&2
+    return 1
+  fi
+
+  if ! sips -g pixelWidth -g pixelHeight "$dst" 2>/dev/null | grep -q "pixelWidth: [0-9]"; then
+    printf "Converted JPEG has no readable pixel dimensions: %s\n" "$dst" >&2
+    return 1
+  fi
+}
+
 while IFS= read -r -d '' file; do
   name="$(basename "$file")"
   ext="${name##*.}"
@@ -58,12 +77,8 @@ while IFS= read -r -d '' file; do
       cp "$file" "$out"
       ;;
     heic|heif)
-      if ! command -v sips >/dev/null 2>&1; then
-        printf "Cannot convert HEIC/HEIF without sips: %s\n" "$file" >&2
-        exit 1
-      fi
       out="$images_dir/$(printf "img_%04d.jpg" "$count")"
-      sips -s format jpeg "$file" --out "$out" >/dev/null
+      convert_heic_to_jpeg "$file" "$out"
       ;;
     *)
       count=$((count - 1))
@@ -77,4 +92,3 @@ if [[ "$count" -eq 0 ]]; then
 fi
 
 printf "Imported %d image(s) into:\n  %s\n" "$count" "$images_dir"
-
