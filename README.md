@@ -8,6 +8,12 @@
 
 后续如果要训练 3D Gaussian Splatting，可以把 COLMAP 结果迁移到支持 CUDA 的 Linux/NVIDIA 机器上继续跑。
 
+远端 `lsh-temp` 上已经跑通一次 1000 iteration 的 3DGS 冒烟训练。远端目录、转换命令、训练参数和本地 viewer 打开方式记录在：
+
+```text
+docs/lsh_temp_training.md
+```
+
 ## 目录结构
 
 ```text

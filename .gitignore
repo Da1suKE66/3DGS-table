@@ -7,6 +7,9 @@ scenes/*/database.db
 scenes/*/sparse/
 scenes/*/dense/
 scenes/*/stereo/
+scenes/*/gaussian/
+
+# Local viewer installs can include large dependencies.
+viewers/
 
 !scenes/.gitkeep
-
